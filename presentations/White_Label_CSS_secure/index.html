@@ -1,0 +1,264 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>White Label project - secure your css</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/sky.css">
+		<link rel="stylesheet" href="css/custom.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+            
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>White Label project</h1>
+					<h2>secure your css</h2>
+				</section>
+				<section>
+					<h2>What is "White Label?"</h2>
+				</section>
+				<section>
+				    <img class="no-border" src="img/Whatelabel.png" alt="">
+				</section>
+				<section>
+					<img src="img/WL-simple%20explanation-large.png">
+					<aside class="notes">
+						<p> - No iframe <br>
+                            - but, our Widget's CSS is inherited...</p>
+					</aside>
+				</section>
+				<section>
+					<h2>And then...</h2>
+				</section>
+				<section>
+					<img class="no-border" src="img/css_awesome.png" alt="">
+					<aside class="notes">
+						<p>
+							- Our layout is broken... simply because we inherit<br>
+							- What we can do?
+						</p>
+					</aside>
+				</section>
+				<section>
+					<ul>
+						<li>Wrapp our widget inside ID</li>
+						<li>Add <b>!important</b> declarations to each of our rules</li>
+						<li>Rename our classnames</li>
+						<li>Whatever you can think about</li>
+					</ul>
+
+					<aside class="notes">
+						- And that all is probably not enough...<br>
+						-> When all seams to be fine - booom! Inheritance ->>
+					</aside>
+				</section>
+				<section>
+					<div class="table">
+						<div class="table-cell">
+							<p>Expected</p><br/>
+							<div class="example-button">Button</div>
+						</div>
+						<div class="table-cell">
+							<p>Resulted</p><br/>
+							<div class="example-button crashed">Button</div>
+						</div>
+					</div>
+					<aside class="notes">
+						
+					</aside>
+				</section>
+				<section>
+					<p>3-d party website styles:</p>
+<pre><code data-trim data-noescape>
+button {
+	color: grey;
+	padding: 10px;
+	height: 30px;
+}
+</code></pre>
+					<p>Our styles:</p>
+<pre><code data-trim data-noescape>
+#wl-wrapper button {
+	color: white !important;
+	padding: 5px !important;
+}
+</code></pre>
+					<aside class="notes">
+						We simply do not cover all possible css rules for each element. We need to reset the styles somehow.
+					</aside>
+				</section>
+				<section>
+					<p>We need to reset all CSS rules to the default values</p>
+					<ul>
+                        <li><b>scoped</b> style attribute</li>
+						<li>CSS3 <b>all</b> rule</li>
+						<li>Cleanslate - reset all rules to initial values <br>
+						<small>https://github.com/premasagar/cleanslate</small></li>
+					</ul>
+					<aside class="notes">
+						Three options we thought about
+					</aside>
+				</section>
+                <section>
+					<p> <b>scoped</b> style rule</p>
+					<img src="img/scoped.png" alt="">
+					<aside class="notes">
+						- Bad support <br>
+						- Removed from specs
+					</aside>
+				</section>
+				<section>
+					<p>CSS3 <b>all</b> rule</p>
+					<img src="img/all.png" alt="">
+					<aside class="notes">
+						- Bad support <br>
+						- Need to be applied to each css rule within the widget
+					</aside>
+				</section>
+				<section>
+					<p>Cleanslate - reset all rules to initial values <br>
+						<small>https://github.com/premasagar/cleanslate</small></p>
+					<img src="img/cleanslate.png" alt="">
+					<aside class="notes">
+                        - Stylesheet - hard reset of all styles for all HTML tags <br>
+					    - Loaded before (!) our CSS styles <br>
+						- Actually what we need <br>
+						- Seems we solve the main problem...
+					</aside>
+				</section>
+				<section><h2>But...</h2></section>
+				<section>
+					<p>3-d party modules</p>
+					<img src="img/widget_map.png" alt="">
+					<aside class="notes">
+						- 3-d party modules inside our widget inside 3-d party webpages <br>
+						- We reset all styles, touching all HTML inside our widget including 3-d party modules <br>
+						- Google maps are broken <br>
+						- So our idea was to do something like that
+					</aside>
+				</section>
+				<section>
+<pre><code data-trim data-noescape>
+#m-wl :not(.disable-cleanslate) h1
+</code></pre>
+				<aside class="notes">
+					- we wrap our widget into ID #m-wl <br>
+					- 3-d party blocks are wrapped by .disable-cleanslate class <br>
+                    - but... ->
+				</aside>                    
+				</section>
+                <section>
+
+<pre><div id="cross-1"></div><div id="cross-2"></div><code data-trim data-noescape>
+#m-wl :not(.disable-cleanslate) h1
+</code></pre>
+				<aside class="notes">
+                    - the solution not works because of :not properties <br>
+                    - for details - you can come to me later <br>
+                    - we need another solution
+				</aside>   
+                    
+				</section>
+                <section>
+                    <p>CSS inheritance map</p>
+					<img src="img/solution.png" alt="">
+					<aside class="notes">
+                        - we got to the solution: remove !importants from Cleanslate <br>
+						- let's see the inheritance map <br>
+                        - No hard reset from Cleanslate <br>
+                        - 3-d party modules (Google maps) use inline styles usually to increase their specifity - so we do not brake them <br>
+                        - only not covered case - importants in styles of the parent website....
+					</aside>
+				</section>  
+				<section>
+					<p>CSS selectors specifity</p>
+					<iframe style="width:100%;" height="500" data-src="https://jonassebastianohlsson.com/specificity-graph/"></iframe>
+					<aside class="notes">
+					    - What to do for the helper classes (like .hidden) ?? <br> 
+						- We increase specifity by :root <br>
+						- We have impotants for each rule -> <br>
+						- important! classes (like .hidden) are wrapped into :root:root
+					</aside>
+				</section>
+				<section>
+					<section>
+						<p>Looks like this?</p>
+						<img class="big" src="img/hack.gif" alt="">
+					</section>
+					<section>
+						<p>But that is actually works</p>
+						<img class="big" src="img/result.gif" alt="">
+					</section>
+				</section>
+				<section>
+					<h1>Thank you :)</h1>
+					<p class="bottom">
+						Grygorii Polinovskyi <br>
+						@polinovskyi <br>
+						polinovskyi.g@gmail.com
+					</p>
+
+					<aside class="notes">
+						- Want to show you live example
+					</aside>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+				progress: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+            
+            Reveal.addEventListener( 'slidechanged', function( event ) {
+                var state = Reveal.getState();
+                if (state.indexh == 16) {
+                    animateCross();
+                }
+            } );
+            
+            function animateCross() {
+                elementAnimate1 = document.getElementById("cross-1");
+                elementAnimate1.classList.remove("animate-cross1");
+                void elementAnimate1.offsetWidth;
+                elementAnimate1.classList.add("animate-cross1");
+                
+                elementAnimate2 = document.getElementById("cross-2");
+                elementAnimate2.classList.remove("animate-cross2");
+                void elementAnimate2.offsetWidth;
+                elementAnimate2.classList.add("animate-cross2");
+            }
+
+            
+		</script>
+	</body>
+</html>
